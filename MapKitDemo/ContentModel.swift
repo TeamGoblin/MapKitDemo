@@ -19,6 +19,8 @@ class ContentModel: NSObject, CLLocationManagerDelegate, ObservableObject {
     @Published var region = MKCoordinateRegion()
     @Published var tower = CLLocationCoordinate2D()
     @Published var position:MapCameraPosition = .userLocation(fallback:.automatic)
+    @Published var lat = 0.0
+    @Published var lon = 0.0
     
     override init() {
         super.init()
@@ -82,6 +84,17 @@ class ContentModel: NSObject, CLLocationManagerDelegate, ObservableObject {
             )
             tower = CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
             position = MapCameraPosition.region(region)
+            lat = $0.coordinate.latitude
+            lon = $0.coordinate.longitude
         }
+    }
+    
+    func update() {
+        region = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+            span: MKCoordinateSpan(latitudeDelta: 0.025, longitudeDelta: 0.025)
+        )
+        tower = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        position = MapCameraPosition.region(region)
     }
 }
